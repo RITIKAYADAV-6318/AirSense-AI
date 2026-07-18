@@ -104,10 +104,32 @@ def apply_imputer(df: pd.DataFrame, imputer: Any) -> pd.DataFrame:
     was originally fitted on (PM10, NOx, O3), leaving every other
     column untouched. Operates on a copy so the caller's frame isn't
     mutated in place.
+
+    NOTE: this deliberately does NOT call `imputer.transform(...)`.
+    SimpleImputer.transform() relies on private internal attributes
+    (e.g. `_fill_dtype`) that have changed between scikit-learn
+    versions, causing `AttributeError: 'SimpleImputer' object has no
+    attribute '_fill_dtype'` when the .pkl was saved with a different
+    sklearn version than the one currently installed. Since a median
+    imputer's *entire* learned state is just one median per column, we
+    replicate the same result manually using only the stable, public
+    `feature_names_in_` / `statistics_` attributes — this works
+    correctly regardless of which scikit-learn version loaded the
+    pickle.
     """
     df = df.copy()
     imputed_cols = list(getattr(imputer, "feature_names_in_", ["PM10", "NOx", "O3"]))
-    df[imputed_cols] = imputer.transform(df[imputed_cols])
+    medians = getattr(imputer, "statistics_", None)
+
+    if medians is None:
+        # Extremely unlikely (would mean the imputer was never fitted),
+        # but fall back to the built-in transform as a last resort.
+        df[imputed_cols] = imputer.transform(df[imputed_cols])
+        return df
+
+    for col, median_value in zip(imputed_cols, medians):
+        df[col] = pd.to_numeric(df[col], errors="coerce").fillna(median_value)
+
     return df
 
 

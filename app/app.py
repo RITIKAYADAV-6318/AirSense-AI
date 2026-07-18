@@ -188,7 +188,7 @@ def render_prediction_section() -> None:
                 co = st.slider("CO (mg/m³)", 0, 10, 2)
                 o3 = st.slider("O₃ (µg/m³)", 0, 200, 60)
                 st.slider("Humidity (%)", 0, 100, 55)
-                st.selectbox("City", ["Delhi", "Bengaluru", "Chennai", "Kolkata"])
+                selected_city = st.selectbox("City", ["Delhi", "Bengaluru", "Chennai", "Kolkata"])
  
             # The model was trained on time + recent-history features
             # (Year/Month/Day/DayOfWeek/WeekOfYear + PM2.5 Lag1/Lag7/
@@ -233,7 +233,9 @@ def render_prediction_section() -> None:
                     "PM2.5_Rolling7": pm25_rolling7,
                 }
                 try:
-                    st.session_state["prediction_result"] = backend.run_full_prediction(raw_inputs)
+                    result = backend.run_full_prediction(raw_inputs)
+                    result["city"] = selected_city
+                    st.session_state["prediction_result"] = result
                 except Exception as exc:  # surfaced to the user, app keeps running
                     st.session_state["prediction_error"] = str(exc)
                     st.session_state.pop("prediction_result", None)
@@ -264,7 +266,12 @@ def render_prediction_section() -> None:
                 aqi_category = result["aqi_category"]
                 aqi_style = result["style"]
                 health_advisory = result["health_advisory"]
-                subtitle = "Live prediction from the Random Forest model"
+                city_label = result.get("city", "")
+                subtitle = (
+                    f"Live prediction for {city_label}"
+                    if city_label
+                    else "Live prediction from the Random Forest model"
+                )
  
             # ---- 1. AQI Result Card ----
             gauge_deg = min(360, (aqi_score / 500) * 360) if aqi_score else 0
