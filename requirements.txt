@@ -1,0 +1,9 @@
+# NOTE: scikit-learn is pinned to the exact version the model/imputer
+# .pkl files were saved with (1.6.1). Newer sklearn versions can fail to
+# unpickle these artifacts (internal attribute names changed), so do not
+# loosen this pin unless you re-save the .pkl files with the newer version.
+streamlit>=1.32
+pandas>=2.0
+numpy>=1.24
+scikit-learn==1.6.1
+joblib>=1.3

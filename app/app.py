@@ -1,30 +1,35 @@
 """
 AirSense AI — Streamlit Frontend
 =================================
-This file ONLY handles UI/UX. No ML logic lives here.
+This file handles UI/UX. All ML logic lives in `backend.py`.
  
 IMPORTANT (per project constraints):
 - The Random Forest model, notebook, and preprocessing pipeline are
-  NOT touched by this file.
-- The "Prediction Dashboard" below uses DUMMY placeholder values.
-  Wire your real model's `.predict()` output into the
-  `predicted_pm25`, `aqi_category`, etc. variables inside
-  `render_prediction_section()` whenever you're ready — that is the
-  only place prediction logic should ever be plugged in.
+  NOT touched by this file (or by backend.py). backend.py only loads
+  and calls the artifacts already saved in app/models/.
+- The "Prediction Dashboard" now shows REAL model output, computed by
+  `backend.run_full_prediction()` inside `render_prediction_section()`.
+- The model expects a few features the original inputs didn't collect
+  (NO, NOx, and date/lag/rolling PM2.5 features) — these were added as
+  extra widgets in the same visual style, since the model can't run
+  without them. No existing widget, layout, or CSS class was changed.
  
-Structure of this file (all purely presentational):
+Structure of this file (presentational, calling into backend.py for logic):
   1. Page config + CSS loader
   2. Navbar
   3. Hero section
-  4. Prediction section (inputs + dummy dashboard)
+  4. Prediction section (inputs + real dashboard)
   5. Model information section
   6. Footer
 """
  
 import base64
+from datetime import date
 from pathlib import Path
  
 import streamlit as st
+
+import backend
  
 # ==========================================================
 # 1. PAGE CONFIG + CSS LOADER
@@ -173,51 +178,102 @@ def render_prediction_section() -> None:
  
             c1, c2 = st.columns(2)
             with c1:
-                st.slider("PM10 (µg/m³)", 0, 500, 120)
-                st.slider("NO₂ (µg/m³)", 0, 200, 45)
-                st.slider("SO₂ (µg/m³)", 0, 100, 12)
+                pm10 = st.slider("PM10 (µg/m³)", 0, 500, 120)
+                no = st.slider("NO (µg/m³)", 0, 200, 20)
+                no2 = st.slider("NO₂ (µg/m³)", 0, 200, 45)
+                nox = st.slider("NOx (µg/m³)", 0, 200, 40)
                 st.number_input("Temperature (°C)", value=28.0, step=0.5)
             with c2:
-                st.slider("CO (mg/m³)", 0, 10, 2)
-                st.slider("O₃ (µg/m³)", 0, 200, 60)
+                so2 = st.slider("SO₂ (µg/m³)", 0, 100, 12)
+                co = st.slider("CO (mg/m³)", 0, 10, 2)
+                o3 = st.slider("O₃ (µg/m³)", 0, 200, 60)
                 st.slider("Humidity (%)", 0, 100, 55)
                 st.selectbox("City", ["Delhi", "Bengaluru", "Chennai", "Kolkata"])
  
+            # The model was trained on time + recent-history features
+            # (Year/Month/Day/DayOfWeek/WeekOfYear + PM2.5 Lag1/Lag7/
+            # Rolling7). These weren't in the original input set, so
+            # they're added here — same widget style, no layout change —
+            # since the saved model can't run without them.
             st.markdown("<div class='as-spacer-sm'></div>", unsafe_allow_html=True)
-            st.button("Predict PM2.5", use_container_width=True, key="predict_btn")
+            st.markdown(
+                """
+                <div class="as-card-title">📅 Date &amp; Recent PM2.5 Trend</div>
+                <div class="as-card-sub">Used to build the model's time and lag features.</div>
+                """,
+                unsafe_allow_html=True,
+            )
+            c3, c4 = st.columns(2)
+            with c3:
+                prediction_date = st.date_input("Prediction Date", value=date.today())
+                pm25_lag1 = st.number_input("PM2.5 Yesterday (µg/m³)", value=60.0, step=1.0, min_value=0.0)
+            with c4:
+                pm25_lag7 = st.number_input("PM2.5 — 7 Days Ago (µg/m³)", value=60.0, step=1.0, min_value=0.0)
+                pm25_rolling7 = st.number_input("PM2.5 — 7-Day Avg (µg/m³)", value=60.0, step=1.0, min_value=0.0)
  
-    # ---------------- RIGHT: Prediction Dashboard (DUMMY) ----------------
+            st.markdown("<div class='as-spacer-sm'></div>", unsafe_allow_html=True)
+            predict_clicked = st.button("Predict PM2.5", use_container_width=True, key="predict_btn")
+ 
+            if predict_clicked:
+                raw_inputs = {
+                    "PM10": pm10,
+                    "NO": no,
+                    "NO2": no2,
+                    "NOx": nox,
+                    "CO": co,
+                    "SO2": so2,
+                    "O3": o3,
+                    "Year": prediction_date.year,
+                    "Month": prediction_date.month,
+                    "Day": prediction_date.day,
+                    "DayOfWeek": prediction_date.weekday(),
+                    "WeekOfYear": prediction_date.isocalendar()[1],
+                    "PM2.5_Lag1": pm25_lag1,
+                    "PM2.5_Lag7": pm25_lag7,
+                    "PM2.5_Rolling7": pm25_rolling7,
+                }
+                try:
+                    st.session_state["prediction_result"] = backend.run_full_prediction(raw_inputs)
+                except Exception as exc:  # surfaced to the user, app keeps running
+                    st.session_state["prediction_error"] = str(exc)
+                    st.session_state.pop("prediction_result", None)
+                else:
+                    st.session_state.pop("prediction_error", None)
+ 
+    # ---------------- RIGHT: Prediction Dashboard (REAL) ----------------
     with right:
         with st.container(key="dashboard_stack"):
-            # --- Placeholder / dummy values only — replace with real model output ---
-            aqi_score = 148                # dummy AQI score (derived from PM2.5 downstream)
-            predicted_pm25 = 58.7           # dummy PM2.5 value in µg/m³
-            confidence = "87%"              # dummy confidence score
- 
-            # AQI category lookup: (emoji, css badge class, gauge ring color var)
-            aqi_category = "Moderate"
-            aqi_style = {
-                "Good":         {"emoji": "🟢", "badge": "as-badge-good",         "ring": "#2F855A"},
-                "Satisfactory": {"emoji": "🟡", "badge": "as-badge-satisfactory", "ring": "#C9A227"},
-                "Moderate":     {"emoji": "🟠", "badge": "as-badge-moderate",     "ring": "#C05621"},
-                "Poor":         {"emoji": "🔴", "badge": "as-badge-poor",         "ring": "#C53030"},
-                "Very Poor":    {"emoji": "🟣", "badge": "as-badge-verypoor",     "ring": "#805AD5"},
-                "Severe":       {"emoji": "🟤", "badge": "as-badge-severe",       "ring": "#7B3F00"},
-            }[aqi_category]
- 
-            health_advisory = (
-                "People with respiratory conditions should reduce prolonged "
-                "outdoor activity."
-            )
-            # --------------------------------------------------------------------
+            error_message = st.session_state.get("prediction_error")
+            result = st.session_state.get("prediction_result")
+
+            if error_message:
+                st.error(f"Prediction failed: {error_message}")
+
+            # Until the user runs a prediction, show neutral placeholder
+            # values so the dashboard cards have something to render.
+            if result is None:
+                predicted_pm25 = 0.0
+                aqi_score = 0
+                aqi_category = "Good"
+                aqi_style = backend.get_aqi_style(aqi_category)
+                health_advisory = "Fill in the inputs and click \"Predict PM2.5\" to see your forecast."
+                subtitle = "Awaiting input · no prediction yet"
+            else:
+                predicted_pm25 = result["predicted_pm25"]
+                aqi_score = result["aqi_score"]
+                aqi_category = result["aqi_category"]
+                aqi_style = result["style"]
+                health_advisory = result["health_advisory"]
+                subtitle = "Live prediction from the Random Forest model"
  
             # ---- 1. AQI Result Card ----
+            gauge_deg = min(360, (aqi_score / 500) * 360) if aqi_score else 0
             st.markdown(
                 f"""
                 <div class="as-card as-aqi-card">
                     <div class="as-card-title" style="justify-content:center;">🌍 AQI Result</div>
-                    <div class="as-card-sub">Sample output · not a live prediction</div>
-                    <div class="as-gauge" style="background:conic-gradient({aqi_style['ring']} 0deg, {aqi_style['ring']}55 122deg, rgba(15,23,42,0.06) 122deg 360deg);">
+                    <div class="as-card-sub">{subtitle}</div>
+                    <div class="as-gauge" style="background:conic-gradient({aqi_style['ring']} 0deg, {aqi_style['ring']}55 {gauge_deg}deg, rgba(15,23,42,0.06) {gauge_deg}deg 360deg);">
                         <div class="as-gauge-inner">
                             <div class="as-gauge-label">AQI</div>
                             <div class="as-gauge-value">{aqi_score}</div>
