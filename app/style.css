@@ -1,0 +1,697 @@
+/* ==========================================================
+   AirSense AI — Apple-inspired glassmorphism theme
+   Palette:
+     --bg-base      #EEF3FB  (soft blue-white canvas)
+     --bg-glow-1    #DCE9FF  (ambient blue glow)
+     --bg-glow-2    #F7EFFF  (ambient violet glow, kept subtle)
+     --ink           #0F172A  (primary text)
+     --ink-muted     #5B6472  (secondary text)
+     --accent        #19547B  (primary deep teal-blue — sampled from logo)
+     --accent-soft   #53B8C7  (secondary / lighter logo teal)
+     --glass         rgba(255,255,255,0.62)
+     --glass-border  rgba(255,255,255,0.55)
+   Fonts:
+     Display / Headings -> "Manrope"  (geometric, confident, Apple-ish)
+     Body / UI           -> "Inter"    (neutral, highly legible)
+   ========================================================== */
+ 
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+ 
+:root{
+    --bg-base:#EEF3F7;
+    --ink:#0F172A;
+    --ink-muted:#5B6472;
+    --accent:#19547B;
+    --accent-soft:#53B8C7;
+    --glass:rgba(255,255,255,0.62);
+    --glass-strong:rgba(255,255,255,0.80);
+    --glass-border:rgba(255,255,255,0.55);
+    --shadow-soft:0 8px 30px rgba(15,23,42,0.06);
+    --shadow-hover:0 16px 40px rgba(25,84,123,0.14);
+    --radius-lg:28px;
+    --radius-md:20px;
+    --radius-sm:14px;
+}
+ 
+/* ---------- Base ---------- */
+html, body, [class*="css"]{
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+}
+ 
+.stApp{
+    background:
+        radial-gradient(1200px 600px at 10% -10%, #E1EEF5 0%, transparent 60%),
+        radial-gradient(1000px 600px at 110% 10%, #E7F4F6 0%, transparent 55%),
+        var(--bg-base);
+    background-attachment:fixed;
+}
+ 
+/* Hide default Streamlit chrome */
+#MainMenu{visibility:hidden;}
+footer{visibility:hidden;}
+header{visibility:hidden;}
+div[data-testid="stDecoration"]{display:none;}
+div[data-testid="stToolbar"]{display:none;}
+ 
+/* Main container spacing */
+.block-container{
+    padding-top:0rem;
+    padding-bottom:0rem;
+    padding-left:0rem;
+    padding-right:0rem;
+    max-width:100%;
+}
+ 
+/* Utility spacer */
+.as-spacer-sm{height:24px;}
+.as-spacer-md{height:48px;}
+.as-spacer-lg{height:96px;}
+ 
+/* ==========================================================
+   NAVBAR
+   ========================================================== */
+.as-navbar{
+    position:sticky;
+    top:0;
+    z-index:999;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:16px 56px;
+    margin-bottom:0;
+    background:var(--glass-strong);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--glass-border);
+}
+ 
+.as-navbar-logo{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:20px;
+    color:var(--ink);
+    letter-spacing:-0.02em;
+}
+ 
+.as-navbar-logo img{
+    width:46px;
+    height:46px;
+    object-fit:contain;
+    filter:drop-shadow(0 4px 10px rgba(25,84,123,0.35));
+}
+ 
+.as-footer-brand img{
+    width:36px;
+    height:36px;
+    object-fit:contain;
+    vertical-align:middle;
+    margin-right:10px;
+    filter:drop-shadow(0 3px 8px rgba(25,84,123,0.3));
+}
+ 
+.as-navbar-links{
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+ 
+.as-navbar-links a{
+    text-decoration:none;
+    color:var(--ink-muted);
+    font-weight:500;
+    font-size:14.5px;
+    padding:9px 18px;
+    border-radius:999px;
+    transition:all 0.25s ease;
+}
+ 
+.as-navbar-links a:hover{
+    color:var(--accent);
+    background:rgba(25,84,123,0.08);
+}
+ 
+/* ==========================================================
+   HERO
+   ========================================================== */
+.as-hero{
+    text-align:center;
+    padding:100px 24px 70px 24px;
+    max-width:900px;
+    margin:0 auto;
+}
+ 
+.as-hero-eyebrow{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-size:13px;
+    font-weight:600;
+    color:var(--accent);
+    background:rgba(25,84,123,0.08);
+    border:1px solid rgba(25,84,123,0.15);
+    padding:7px 16px;
+    border-radius:999px;
+    margin-bottom:28px;
+    letter-spacing:0.02em;
+}
+ 
+.as-hero h1{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:58px;
+    line-height:1.1;
+    letter-spacing:-0.03em;
+    color:var(--ink);
+    margin:0 0 22px 0;
+}
+ 
+.as-hero h1 .as-highlight{
+    background:linear-gradient(120deg, var(--accent) 0%, #53B8C7 100%);
+    -webkit-background-clip:text;
+    -webkit-text-fill-color:transparent;
+    background-clip:text;
+}
+ 
+.as-hero p{
+    font-size:18px;
+    font-weight:400;
+    color:var(--ink-muted);
+    line-height:1.65;
+    max-width:620px;
+    margin:0 auto 40px auto;
+}
+ 
+/* Primary CTA — Streamlit button restyle */
+.stButton{
+    display:flex;
+    justify-content:center;
+}
+ 
+.stButton > button{
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:15.5px;
+    color:#ffffff !important;
+    background:linear-gradient(135deg, var(--accent) 0%, #2C7F9D 100%) !important;
+    border:none !important;
+    padding:14px 36px !important;
+    border-radius:999px !important;
+    box-shadow:0 10px 26px rgba(25,84,123,0.32) !important;
+    transition:transform 0.25s ease, box-shadow 0.25s ease !important;
+}
+ 
+.stButton > button:hover{
+    transform:translateY(-2px) scale(1.02);
+    box-shadow:0 14px 34px rgba(25,84,123,0.42) !important;
+    color:#ffffff !important;
+}
+ 
+.stButton > button:active{
+    transform:translateY(0px) scale(0.99);
+}
+ 
+/* ==========================================================
+   SECTION SHELL
+   ========================================================== */
+.as-section{
+    max-width:1180px;
+    margin:0 auto;
+    padding:70px 32px;
+}
+ 
+.as-section-head{
+    text-align:center;
+    max-width:640px;
+    margin:0 auto 48px auto;
+}
+ 
+.as-section-tag{
+    font-size:12.5px;
+    font-weight:700;
+    color:var(--accent);
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    margin-bottom:10px;
+}
+ 
+.as-section-head h2{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:34px;
+    letter-spacing:-0.02em;
+    color:var(--ink);
+    margin:0 0 12px 0;
+}
+ 
+.as-section-head p{
+    font-size:15.5px;
+    color:var(--ink-muted);
+    line-height:1.6;
+}
+ 
+/* ==========================================================
+   GLASS CARD (generic)
+   ========================================================== */
+.as-card{
+    background:var(--glass);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    padding:32px;
+    box-shadow:var(--shadow-soft);
+    transition:transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+ 
+.as-card:hover{
+    transform:translateY(-4px);
+    box-shadow:var(--shadow-hover);
+    border-color:rgba(25,84,123,0.25);
+}
+ 
+.as-card-title{
+    font-family:'Manrope', sans-serif;
+    font-weight:700;
+    font-size:17px;
+    color:var(--ink);
+    margin-bottom:6px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+ 
+.as-card-sub{
+    font-size:13.5px;
+    color:var(--ink-muted);
+    margin-bottom:18px;
+}
+ 
+/* ---------- Prediction section specific ---------- */
+ 
+/* Make the two-column row stretch both columns to equal height, so the
+   left card and right dashboard stack always align top-to-bottom. */
+div[data-testid="stHorizontalBlock"]{
+    align-items:stretch;
+}
+div[data-testid="column"],
+div[data-testid="stColumn"]{
+    display:flex;
+}
+div[data-testid="column"] > div,
+div[data-testid="stColumn"] > div{
+    width:100%;
+}
+ 
+/* st.container(key="input_card") — Streamlit adds a `.st-key-input_card`
+   class to the container's outer wrapper, giving us a REAL parent element
+   around the widgets (unlike a hand-split raw <div>, this always nests
+   correctly, which is what keeps the card visually intact and equal in
+   height to the dashboard on the right). */
+.st-key-input_card{
+    background:var(--glass);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-lg);
+    padding:32px;
+    box-shadow:var(--shadow-soft);
+    box-sizing:border-box;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+}
+ 
+.st-key-input_card > div[data-testid="stVerticalBlock"]{
+    display:flex;
+    flex-direction:column;
+    height:100%;
+    flex:1;
+}
+ 
+/* Push the Predict button to the bottom edge so it lines up with the
+   bottom of the right-hand dashboard stack, regardless of content height */
+.st-key-input_card div[data-testid="stButton"]{
+    margin-top:auto;
+}
+ 
+/* Streamlit slider + number input restyle */
+.stSlider label, .stNumberInput label, .stSelectbox label{
+    font-family:'Inter', sans-serif !important;
+    font-weight:600 !important;
+    font-size:13.5px !important;
+    color:var(--ink) !important;
+}
+ 
+.stSlider [data-baseweb="slider"] div div div{
+    background:var(--accent) !important;
+}
+ 
+div[data-testid="stNumberInput"] input,
+div[data-baseweb="select"] > div{
+    border-radius:12px !important;
+    border:1px solid rgba(15,23,42,0.10) !important;
+    background:rgba(255,255,255,0.75) !important;
+}
+ 
+/* ==========================================================
+   PREDICTION DASHBOARD (right column)
+   Stack of cards: AQI Result, Predicted PM2.5, Health Advisory,
+   Model Information — all share the .as-card base style.
+   ========================================================== */
+ 
+/* st.container(key="dashboard_stack") — real wrapper around all 4 cards,
+   used purely to control vertical gap and match the left card's height. */
+.st-key-dashboard_stack{
+    height:100%;
+}
+ 
+.st-key-dashboard_stack div[data-testid="stVerticalBlock"]{
+    gap:20px;
+}
+ 
+/* ---------- 1. AQI Result card ---------- */
+.as-aqi-card{
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    background:linear-gradient(160deg, rgba(25,84,123,0.10) 0%, rgba(255,255,255,0.55) 60%);
+}
+ 
+.as-gauge{
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin:8px auto 22px auto;
+    box-shadow:0 12px 30px rgba(25,84,123,0.18);
+}
+ 
+.as-gauge-inner{
+    width:140px;
+    height:140px;
+    border-radius:50%;
+    background:var(--glass-strong);
+    backdrop-filter:blur(10px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+}
+ 
+.as-gauge-label{
+    font-size:12px;
+    font-weight:700;
+    letter-spacing:0.1em;
+    color:var(--ink-muted);
+    margin-bottom:2px;
+}
+ 
+.as-gauge-value{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:40px;
+    color:var(--ink);
+    line-height:1;
+}
+ 
+/* AQI category badges — colors mirror the standard AQI scale */
+.as-badge{
+    display:inline-block;
+    padding:7px 18px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:0.02em;
+}
+ 
+.as-badge-good{
+    background:rgba(47,133,90,0.14);
+    color:#2F855A;
+}
+ 
+.as-badge-satisfactory{
+    background:rgba(201,162,39,0.16);
+    color:#8A6D1B;
+}
+ 
+.as-badge-moderate{
+    background:rgba(192,86,33,0.14);
+    color:#C05621;
+}
+ 
+.as-badge-poor{
+    background:rgba(197,48,48,0.14);
+    color:#C53030;
+}
+ 
+.as-badge-verypoor{
+    background:rgba(128,90,213,0.14);
+    color:#6B46C1;
+}
+ 
+.as-badge-severe{
+    background:rgba(123,63,0,0.16);
+    color:#7B3F00;
+}
+ 
+/* ---------- 2. Predicted PM2.5 metric card ---------- */
+.as-metric-card{
+    display:flex;
+    align-items:center;
+    gap:18px;
+}
+ 
+.as-metric-icon{
+    flex-shrink:0;
+    width:52px;
+    height:52px;
+    border-radius:14px;
+    background:rgba(25,84,123,0.08);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:22px;
+}
+ 
+.as-metric-label{
+    font-size:13px;
+    font-weight:600;
+    color:var(--ink-muted);
+    margin-bottom:4px;
+}
+ 
+.as-metric-value{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:26px;
+    color:var(--ink);
+}
+ 
+.as-metric-value span{
+    font-family:'Inter', sans-serif;
+    font-weight:500;
+    font-size:14px;
+    color:var(--ink-muted);
+    margin-left:4px;
+}
+ 
+/* ---------- 3. Health Advisory card ---------- */
+.as-advisory-card{
+    display:flex;
+    align-items:flex-start;
+    gap:16px;
+    background:linear-gradient(160deg, rgba(25,84,123,0.08) 0%, rgba(255,255,255,0.55) 70%);
+}
+ 
+.as-advisory-icon{
+    flex-shrink:0;
+    width:44px;
+    height:44px;
+    border-radius:12px;
+    background:rgba(25,84,123,0.10);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:19px;
+}
+ 
+.as-advisory-text p{
+    font-size:14px;
+    color:var(--ink);
+    line-height:1.55;
+    margin:0;
+}
+ 
+/* ---------- 4. Model Information mini-card ---------- */
+.as-modelinfo-card{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+ 
+.as-modelinfo-row{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:11px 0;
+    border-bottom:1px solid rgba(15,23,42,0.06);
+}
+ 
+.as-modelinfo-row:last-child{
+    border-bottom:none;
+}
+ 
+.as-modelinfo-label{
+    font-size:13.5px;
+    color:var(--ink-muted);
+    font-weight:500;
+}
+ 
+.as-modelinfo-value{
+    font-size:13.5px;
+    color:var(--ink);
+    font-weight:600;
+    text-align:right;
+}
+ 
+.as-modelinfo-highlight{
+    color:var(--accent);
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:15px;
+}
+ 
+/* ---------- Model info stat cards ---------- */
+.as-stat-card{
+    background:var(--glass);
+    backdrop-filter:blur(16px);
+    -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border);
+    border-radius:var(--radius-md);
+    padding:26px 22px;
+    text-align:center;
+    box-shadow:var(--shadow-soft);
+    transition:transform 0.3s ease, box-shadow 0.3s ease;
+}
+ 
+.as-stat-card:hover{
+    transform:translateY(-4px);
+    box-shadow:var(--shadow-hover);
+}
+ 
+.as-stat-value{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:28px;
+    color:var(--accent);
+    margin-bottom:4px;
+}
+ 
+.as-stat-label{
+    font-size:13px;
+    color:var(--ink-muted);
+    font-weight:500;
+}
+ 
+.as-city-pill{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    background:rgba(25,84,123,0.08);
+    color:var(--accent);
+    border:1px solid rgba(25,84,123,0.16);
+    padding:8px 16px;
+    border-radius:999px;
+    font-size:13.5px;
+    font-weight:600;
+    margin:4px 6px;
+}
+ 
+/* ==========================================================
+   FOOTER
+   ========================================================== */
+.as-footer{
+    background:var(--glass-strong);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
+    border-top:1px solid var(--glass-border);
+    padding:44px 56px 32px 56px;
+    margin-top:60px;
+}
+ 
+.as-footer-top{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    flex-wrap:wrap;
+    gap:20px;
+    max-width:1180px;
+    margin:0 auto 24px auto;
+}
+ 
+.as-footer-brand{
+    font-family:'Manrope', sans-serif;
+    font-weight:800;
+    font-size:18px;
+    color:var(--ink);
+}
+ 
+.as-footer-links{
+    display:flex;
+    gap:14px;
+}
+ 
+.as-footer-links a{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    background:rgba(25,84,123,0.08);
+    color:var(--accent);
+    text-decoration:none;
+    transition:all 0.25s ease;
+    border:1px solid rgba(25,84,123,0.12);
+}
+ 
+.as-footer-links a svg{
+    width:18px;
+    height:18px;
+    fill:currentColor;
+}
+ 
+.as-footer-links a:hover{
+    background:var(--accent);
+    color:#fff;
+    transform:translateY(-3px);
+}
+ 
+.as-footer-bottom{
+    text-align:center;
+    font-size:12.5px;
+    color:var(--ink-muted);
+    padding-top:20px;
+    border-top:1px solid rgba(15,23,42,0.06);
+    max-width:1180px;
+    margin:0 auto;
+}
+ 
+/* ==========================================================
+   RESPONSIVE
+   ========================================================== */
+@media (max-width: 900px){
+    .as-navbar{padding:14px 20px;}
+    .as-navbar-links{display:none;}
+    .as-hero h1{font-size:38px;}
+    .as-hero p{font-size:16px;}
+    .as-section{padding:48px 18px;}
+    .as-footer-top{flex-direction:column;text-align:center;}
+} 
