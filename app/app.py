@@ -35,24 +35,33 @@ import backend
 # 1. PAGE CONFIG + CSS LOADER
 # ==========================================================
  
-LOGO_PATH = "assets/logo.png"  # place the brand logo image here
+# Anchor all file paths to this script's own directory rather than the
+# process working directory. Locally, `streamlit run app.py` from inside
+# `app/` makes relative paths like "style.css" resolve correctly by
+# coincidence. Streamlit Community Cloud, however, always runs with the
+# working directory set to the repo root regardless of where the main
+# module lives — so a bare "style.css" or "assets/logo.png" fails there
+# with FileNotFoundError even though it works fine locally.
+APP_DIR = Path(__file__).parent
+LOGO_PATH = APP_DIR / "assets" / "logo.png"  # place the brand logo image here
+CSS_PATH = APP_DIR / "style.css"
  
 st.set_page_config(
     page_title="AirSense AI",
-    page_icon=LOGO_PATH if Path(LOGO_PATH).exists() else "🌤️",
+    page_icon=str(LOGO_PATH) if LOGO_PATH.exists() else "🌤️",
     layout="wide",
     initial_sidebar_state="collapsed",
 )
  
  
-def load_css(path: str = "style.css") -> None:
+def load_css(path: Path = CSS_PATH) -> None:
     """Inject the external stylesheet into the Streamlit app."""
     with open(path) as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
  
  
 @st.cache_data
-def get_logo_base64(path: str = LOGO_PATH) -> str:
+def get_logo_base64(path: Path = LOGO_PATH) -> str:
     """
     Read the logo image from disk and return it as a base64 data-URI so it
     can be embedded directly inside custom HTML (navbar / footer).
