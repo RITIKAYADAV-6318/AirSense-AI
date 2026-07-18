@@ -339,7 +339,7 @@ def render_prediction_section() -> None:
                     </div>
                     <div class="as-modelinfo-row">
                         <span class="as-modelinfo-label">R² Score</span>
-                        <span class="as-modelinfo-value as-modelinfo-highlight">0.947</span>
+                        <span class="as-modelinfo-value as-modelinfo-highlight">0.9473</span>
                     </div>
                 </div>
                 """,
@@ -375,8 +375,8 @@ def render_model_section() -> None:
     stats = [
         ("Random Forest", "Model Architecture"),
         ("Delhi", "Training City"),
-        ("R² 0.91", "Reported Accuracy"),
-        ("MAE 14.2", "Mean Abs. Error (µg/m³)"),
+        ("R² 0.9473", "Reported Accuracy"),
+        ("MAE 12.02", "Mean Abs. Error (µg/m³)"),
     ]
     for col, (value, label) in zip([s1, s2, s3, s4], stats):
         with col:
@@ -440,8 +440,8 @@ def render_footer() -> None:
             <div class="as-footer-top">
                 <div class="as-footer-brand">{footer_logo_html}AirSense AI</div>
                 <div class="as-footer-links">
-                    <a href="https://github.com" target="_blank" title="GitHub">{github_icon}</a>
-                    <a href="https://linkedin.com" target="_blank" title="LinkedIn">{linkedin_icon}</a>
+                    <a href="https://github.com/RITIKAYADAV-6318/AirSense-AI" target="_blank" title="GitHub">{github_icon}</a>
+                    <a href="https://www.linkedin.com/company/airsense-ai/" target="_blank" title="LinkedIn">{linkedin_icon}</a>
                     <a href="mailto:hello@airsense.ai" title="Email">{mail_icon}</a>
                 </div>
             </div>

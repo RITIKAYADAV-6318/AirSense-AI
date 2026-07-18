@@ -356,6 +356,24 @@ div[data-baseweb="select"] > div{
     border:1px solid rgba(15,23,42,0.10) !important;
     background:rgba(255,255,255,0.75) !important;
 }
+
+/* Fix: the selectbox's chosen value (e.g. "Bengaluru") was rendering
+   invisible — it inherits Streamlit's default text color, which is
+   white/light when a visitor's OS/browser prefers dark mode, against
+   this light card background. Force it to the same ink color as every
+   other label on the page, for both the closed box and the open
+   dropdown menu (which Streamlit renders in a portal at the body root,
+   outside this card, so it needs its own explicit rule too). */
+div[data-baseweb="select"] > div,
+div[data-baseweb="select"] > div *{
+    color:var(--ink) !important;
+}
+
+div[data-baseweb="popover"] li,
+div[data-baseweb="menu"] li,
+div[data-baseweb="popover"] li *{
+    color:var(--ink) !important;
+}
  
 /* ==========================================================
    PREDICTION DASHBOARD (right column)
