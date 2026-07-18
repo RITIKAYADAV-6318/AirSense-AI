@@ -45,11 +45,19 @@ st.set_page_config(
 )
  
  
-def load_css(path: str = "style.css") -> None:
-    """Inject the external stylesheet into the Streamlit app."""
-    with open(path) as f:
-        st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
- 
+from pathlib import Path
+
+def load_css() -> None:
+    css_path = Path(__file__).parent / "style.css"
+
+    if css_path.exists():
+        with open(css_path, "r", encoding="utf-8") as f:
+            st.markdown(
+                f"<style>{f.read()}</style>",
+                unsafe_allow_html=True
+            )
+    else:
+        st.error(f"CSS file not found: {css_path}") 
  
 @st.cache_data
 def get_logo_base64(path: str = LOGO_PATH) -> str:
